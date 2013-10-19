@@ -19,14 +19,15 @@ from its username")
 (defparameter *session* nil
   "The expression for accessing the session object.")
 
+(defun digest (str type)
+  (ironclad:byte-array-to-hex-string
+   (ironclad:digest-sequence type
+     (flexi-streams:string-to-octets str))))
+
 (defun hash (str type iters)
-  (declare (string str)
-           (fixnum iters))
-  (let ((digest (ironclad:make-digest type))
-        (array (trivial-utf-8:string-to-utf-8-bytes str)))
-    (dotimes (i iters)
-      (setf array (ironclad:digest-sequence digest array)))
-    (ironclad:byte-array-to-hex-string array)))
+  (if (= iters 1)
+      (digest str type)
+      (hash (digest str type) type (1- iters))))
 
 (defparameter +known-digests+
   (mapcar (lambda (sym) (intern (symbol-name sym) :keyword))
@@ -73,7 +74,7 @@ from its username")
 (defmacro logged-in-p ()
   `(gethash :username ,hermetic::*session*))
 
-(defmacro username ()
+(defmacro user-name ()
   `(logged-in-p))
 
 (defmacro roles ()
