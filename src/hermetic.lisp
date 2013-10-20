@@ -62,12 +62,13 @@ from its username")
        ((nil) ,on-failure)
        (:no-user ,on-no-user))))
 
-(defmacro logout ()
+(defmacro logout (on-success on-failure)
   `(progn
      (if (logged-in-p)
          (progn (remhash :username ,hermetic::*session*)
                 (remhash :roles ,hermetic::*session*)
-                t))))
+                ,on-success)
+         ,on-failure)))
 
 ;;; Functions for getting information about the logged-in user
 

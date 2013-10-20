@@ -12,7 +12,8 @@
                 :setup
                 :login
                 :logged-in-p
-                :username)
+                :user-name
+                :logout)
   (:export :stop))
 (in-package :hermetic-demo)
 
@@ -40,7 +41,7 @@
 (setf (ningle:route *app* "/")
       (lambda  (params)
         (if (logged-in-p)
-            (html5 (:p (format nil "Welcome, ~A!" (username)))
+            (html5 (:p (format nil "Welcome, ~A!" (user-name)))
                    (:a :href "/logout" "Logout"))
             (html5
              (:form :action "/login" :method "post"
@@ -54,6 +55,12 @@
                (html5 (:h1 "You are logged in"))
                (html5 (:h1 "Wrong password :c"))
                (html5 (:h1 "No such username")))))
+
+(setf (ningle:route *app* "/logout" :method :GET)
+      (lambda (params)
+        (logout
+         (html5 (:h1 "You are logged out"))
+         (html5 (:h1 "You are not logged in.")))))
 
 (defparameter *handler*
   (clack:clackup

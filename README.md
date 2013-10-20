@@ -55,7 +55,7 @@ functions for accessing user data from inside a view.
 
 ## `logout`
 
-Logs the user out.
+Logs the user out. Takes two expressions, `on-success` and `on-failure`.
 
 # License
 
