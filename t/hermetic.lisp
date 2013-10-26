@@ -5,8 +5,8 @@
         :fiveam))
 (in-package :hermetic-test)
 
-;(def-suite hash
-;  :description "Testing the hash function")
+(def-suite hash
+  :description "Testing the hash function")
 
 (defparameter +hash-iters+
   (list
@@ -18,5 +18,16 @@
   "The SHA256 of the string 'test', position in the list is
 the number of iterations")
 
-(loop for i from 1 to (length +hash-iters+) do
-  (princ (equal (hermetic::hash "test" :sha256 i) (nth (1- i) +hash-iters+))))
+(test (sha-256 nil hash)
+      (is (equal (hermetic::hash "test" :sha256 1)
+                 (nth 0 +hash-iters+)))
+      (is (equal (hermetic::hash "test" :sha256 2)
+                 (nth 1 +hash-iters+)))
+      (is (equal (hermetic::hash "test" :sha256 3)
+                 (nth 2 +hash-iters+)))
+      (is (equal (hermetic::hash "test" :sha256 4)
+                 (nth 3 +hash-iters+)))
+      (is (equal (hermetic::hash "test" :sha256 5)
+                 (nth 4 +hash-iters+))))
+
+(run!)
