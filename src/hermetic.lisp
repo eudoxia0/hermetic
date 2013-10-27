@@ -5,7 +5,8 @@
            :logged-in-p
            :username
            :roles
-           :role-p))
+           :role-p
+           :auth))
 (in-package :hermetic)
 
 (defparameter *user-p* nil
@@ -18,6 +19,9 @@ from its username")
   "A function that maps a username to a list of roles.")
 (defparameter *session* nil
   "The expression for accessing the session object.")
+(defparameter *denied-page* nil
+  "A function that gets called when a user tries to access a page without
+sufficient privileges")
 
 (defun digest (str type)
   (ironclad:byte-array-to-hex-string
@@ -40,13 +44,14 @@ from its username")
           (equal (funcall *user-pass* user) (hash pass type iters))
           :no-user)))
 
-(defmacro setup (&key user-p user-pass user-roles session)
+(defmacro setup (&key user-p user-pass user-roles session denied)
   "Provide functions for *user-p* and *user-pass*"
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (setf hermetic::*user-p* ,user-p
            hermetic::*user-pass* ,user-pass
            hermetic::*user-roles* ,user-roles
-           hermetic::*session* ',session)))
+           hermetic::*session* ',session
+           hermetic::*denied-page* ,denied)))
 
 (defmacro login (params (&key (hash :sha256) (iters 15000))
                  on-success on-failure on-no-user)
@@ -83,3 +88,10 @@ from its username")
 
 (defmacro role-p (role)
   `(member ,role (gethash :roles ,hermetic::*session*)))
+
+(defmacro auth ((&rest roles) page &optional denied-page)
+  `(if (intersection (list ,@roles) (roles))
+       ,page
+       ,(if denied-page
+            denied-page
+            `(funcall hermetic::*denied-page*))))

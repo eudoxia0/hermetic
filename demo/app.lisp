@@ -13,7 +13,8 @@
                 :login
                 :logged-in-p
                 :user-name
-                :logout)
+                :logout
+                :auth)
   (:export :stop))
 (in-package :hermetic-demo)
 
@@ -36,10 +37,12 @@
  :user-p #'(lambda (user) (get-user user))
  :user-pass #'(lambda (user) (getf (get-user user) :pass))
  :user-roles #'(lambda (user) (getf (get-user user) :roles))
- :session *session*)
+ :session *session*
+ :denied #'(lambda (&optional params)
+             (html5 (:h1 "Generic auth denied page"))))
 
 (setf (ningle:route *app* "/")
-      (lambda  (params)
+      (lambda (params)
         (if (logged-in-p)
             (html5 (:p (format nil "Welcome, ~A!" (user-name)))
                    (:a :href "/logout" "Logout"))
@@ -61,6 +64,17 @@
         (logout
          (html5 (:h1 "You are logged out"))
          (html5 (:h1 "You are not logged in.")))))
+
+(setf (ningle:route *app* "/users-only" :method :GET)
+      (lambda (params)
+        (auth (:user)
+              (html5 (:h1 "If you are seeing this, you are an admin.")))))
+
+(setf (ningle:route *app* "/admins-only" :method :GET)
+      (lambda (params)
+        (auth (:admin)
+              (html5 (:h1 "If you are seeing this, you are a user."))
+              (html5 (:h1 "Custom auth denied page. You are not authorized!")))))
 
 (defparameter *handler*
   (clack:clackup
