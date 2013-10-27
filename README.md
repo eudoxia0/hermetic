@@ -19,6 +19,7 @@ As such, it needs to be told how to find a user's information to provide authent
                    ;; for example: (:user) (:user :tester :staff) (:user :admin)
     :session       ;; the /expression/ for the session object. ningle:*session* on
                    ;; Ningle <https://github.com/fukamachi/ningle>.
+    :denied        ;; A function that displays an "access denied" message
                    )
 ```
 
@@ -39,9 +40,21 @@ For example, if your users are stored in a simple in-memory hash-table as in the
 
 When creating your login view, the `login` macro handles most of the work for you.
 
-## `auth` decorator
+## `auth`
 
-TODO
+Grants access to a site only to users whose roles intersect with the roles in the first argument.
+
+If an access denied page is not provided, the global one is used instead.
+
+Example:
+
+```lisp
+(setf (route *app* "/user/profile/:userid" :method :GET)
+      (lambda (params
+        (auth (:user)
+              (render-template "templates/profile.html")
+              (render-error "You have to log in to view user profiles.")))))
+```
 
 ## Misc.
 
