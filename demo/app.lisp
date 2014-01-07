@@ -24,7 +24,8 @@
 
 (defun make-user (username pass roles)
   (setf (gethash username *users*)
-        (list :pass (hermetic::hash pass :sha256 15000)
+        (list :pass (hermetic:hash pass :type :pbkdf2-sha256
+                                        :iterations 10000)
               :roles roles)))
 
 (make-user "admin" "admin" (list :user :staff :admin))
@@ -54,7 +55,7 @@
 
 (setf (ningle:route *app* "/login" :method :POST)
       (lambda (params)
-        (login params ()
+        (login params
                (html5 (:h1 "You are logged in"))
                (html5 (:h1 "Wrong password :c"))
                (html5 (:h1 "No such username")))))
@@ -68,18 +69,19 @@
 (setf (ningle:route *app* "/users-only" :method :GET)
       (lambda (params)
         (auth (:user)
-              (html5 (:h1 "If you are seeing this, you are an admin.")))))
+              (html5 (:h1 "If you are seeing this, you are a user.")))))
 
 (setf (ningle:route *app* "/admins-only" :method :GET)
       (lambda (params)
         (auth (:admin)
-              (html5 (:h1 "If you are seeing this, you are a user."))
+              (html5 (:h1 "If you are seeing this, you are an admin."))
               (html5 (:h1 "Custom auth denied page. You are not authorized!")))))
 
 (defparameter *handler*
   (clack:clackup
    (builder
     <clack-middleware-session>
-    *app*)))
+    *app*)
+   :port 8000))
 
 (defun stop () (clack:stop *handler*))
