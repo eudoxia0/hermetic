@@ -9,7 +9,8 @@
   :license "LLGPL"
   :depends-on (:clack
                :ironclad
-               :trivial-utf-8)
+               :trivial-utf-8
+               :split-sequence)
   :components ((:module "src"
                 :components
                 ((:file "hermetic"))))
