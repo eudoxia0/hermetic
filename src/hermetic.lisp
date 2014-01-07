@@ -1,6 +1,7 @@
 (defpackage hermetic
   (:use :cl)
-  (:export :setup
+  (:export :hash
+           :setup
            :login
            :logged-in-p
            :username
@@ -23,26 +24,60 @@ from its username")
   "A function that gets called when a user tries to access a page without
 sufficient privileges")
 
-(defun digest (str type)
-  (ironclad:byte-array-to-hex-string
-   (ironclad:digest-sequence type
-     (flexi-streams:string-to-octets str))))
-
-(defun hash (str type iters)
-  (if (= iters 1)
-      (digest str type)
-      (hash (digest str type) type (1- iters))))
-
 (defparameter +known-digests+
-  (mapcar (lambda (sym) (intern (symbol-name sym) :keyword))
-          (ironclad:list-all-digests)))
+  (list :pbkdf2-sha1 :pbkdf2-sha256 :pbkdf2-sha512))
 
-(defun authorize (user pass type iters)
-  (if (not (member type +known-digests+ :test #'eq))
-      (error "Unknown digest type: ~A" type)
-      (if (funcall *user-p* user)
-          (equal (funcall *user-pass* user) (hash pass type iters))
-          :no-user)))
+(defun salt (&optional (size 16))
+  (ironclad:make-random-salt size))
+
+(defun pbkdf2 (password salt digest iterations)
+  (ironclad:pbkdf2-hash-password-to-combined-string password
+                                                    :salt salt
+                                                    :digest digest
+                                                    :iterations iterations))
+
+(defun hash (password &key (type :pbkdf2-sha256)
+                      (salt (salt 16))
+                      (iterations 25000))
+  (let ((pass (trivial-utf-8:string-to-utf-8-bytes password)))
+    (case type
+      (:pbkdf2-sha1
+       (pbkdf2 pass salt :sha1 iterations))
+      (:pbkdf2-sha256
+       (pbkdf2 pass salt :sha256 iterations))
+      (:pbkdf2-sha512
+       (pbkdf2 pass salt :sha512 iterations))
+      (t
+       (error "No such digest: ~A. Available digests: ~A."
+              type
+              +known-digests+)))))
+
+(defun parse-password-hash (password-hash)
+  "Because Ironclad's pbkdf2-check-password is broken."
+  (let* ((split (split-sequence:split-sequence #\$ password-hash))
+         (function (first split))
+         (digest (first
+                  (split-sequence:split-sequence #\: (second split)))))
+    (list :digest (intern (string-upcase (concatenate 'string function "-" digest))
+                          :keyword)
+          :iterations (parse-integer
+                       (second (split-sequence:split-sequence #\: (second split))))
+          :salt (third split)
+          :hash (fourth split))))
+
+(defun check-password (pass password-hash)
+  (let ((parsed (parse-password-hash password-hash)))
+    (equal password-hash
+           (hash pass
+                 :type (getf parsed :digest)
+                 :salt (ironclad:hex-string-to-byte-array (getf parsed :salt))
+                 :iterations (getf parsed :iterations)))))
+                 
+
+(defun authorize (user pass)
+  (if (funcall *user-p* user)
+      (check-password pass (funcall *user-pass* user))
+      :no-user))
 
 (defmacro setup (&key user-p user-pass user-roles session denied)
   "Provide functions for *user-p* and *user-pass*"
@@ -53,12 +88,11 @@ sufficient privileges")
            hermetic::*session* ',session
            hermetic::*denied-page* ,denied)))
 
-(defmacro login (params (&key (hash :sha256) (iters 15000))
-                 on-success on-failure on-no-user)
+(defmacro login (params on-success on-failure on-no-user)
   `(let ((user (getf ,params :|username|))
          (pass (getf ,params :|password|)))
      (declare (string user pass))
-     (case (hermetic::authorize user pass ,hash ,iters)
+     (case (hermetic::authorize user pass)
        ((t) (progn
               ;; Store login data on the session
               (setf (gethash :username ,hermetic::*session*) user)
