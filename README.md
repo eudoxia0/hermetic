@@ -6,6 +6,14 @@ Simple authentication for [Clack](http://clacklisp.org/)-based Common Lisp web a
 
 See the demo app for a complete example.
 
+## Available Password-Hashing Functions
+
+To mitigate the risks of the NSA convincing people to hash passwords with things like SHA-256, only PBKDF2 (And eventually scrypt) is supported
+
+* `:pbkdf2-sha1`
+* `:pbkdf2-sha256`
+* `:pbkdf2-sha512`
+
 ## `setup`
 
 Hermetic is not opinionated, doesn't integrate into an existing database or create any models.
