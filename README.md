@@ -82,4 +82,4 @@ Logs the user out. Takes two expressions, `on-success` and `on-failure`.
 
 Copyright (c) 2013 Fernando Borretti (eudoxiahp@gmail.com).
 
-Licensed under the [LLGPL License](http://www.cliki.net/llgpl).
+Licensed under the MIT License.

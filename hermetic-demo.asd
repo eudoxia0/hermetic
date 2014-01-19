@@ -6,7 +6,7 @@
 (defsystem hermetic-demo
   :version "0.1"
   :author "Fernando Borretti"
-  :license "LLGPL"
+  :license "MIT"
   :depends-on (:hermetic
                :ningle
                :cl-markup)
