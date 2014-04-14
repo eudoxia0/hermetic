@@ -38,7 +38,7 @@ sufficient privileges")
 
 (defun hash (password &key (type :pbkdf2-sha256)
                       (salt (salt 16))
-                      (iterations 25000))
+                      (iterations 80000))
   (let ((pass (trivial-utf-8:string-to-utf-8-bytes password)))
     (case type
       (:pbkdf2-sha1
