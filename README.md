@@ -6,6 +6,22 @@ Simple authentication for [Clack](http://clacklisp.org/)-based Common Lisp web a
 
 See the demo app for a complete example.
 
+# Structure
+
+Hermetic implements authentication and authorization, respectively, using
+*strategies* and *roles*.
+
+## Strategies
+
+A strategy represents a pluggable module that decides whether requests are
+authorized to go through the web application or should be denied.
+
+At the moment, Hermetic only supports trivial, Cookie-based authentication in
+the `hermetic-cookie` module.
+
+## Roles
+
+
 ## Available Password-Hashing Functions
 
 To mitigate the risks of the NSA convincing people to hash passwords with things like SHA-256, only PBKDF2 (And eventually scrypt) is supported
