@@ -1,6 +1,7 @@
 (defpackage hermetic
   (:use :cl)
   (:export :hash
+           :check-password
            :setup
            :login
            :logged-in-p
@@ -38,7 +39,8 @@ sufficient privileges")
 
 (defun hash (password &key (type :pbkdf2-sha256)
                       (salt (salt 16))
-                      (iterations 80000))
+                      (iterations 20000))
+  (declare (optimize (speed 3) (safety 0) (debug 0)))
   (let ((pass (trivial-utf-8:string-to-utf-8-bytes password)))
     (case type
       (:pbkdf2-sha1
