@@ -19,15 +19,13 @@
 ;; Configuration
 
 (crane:setup
- `(:migrations-directory
-   ,(merge-pathnames
-     #p"demo/migrations/"
-     (asdf:component-pathname
-      (asdf:find-system :hermetic-crane-demo)))
-   :databases
-   (:main
-    (:type :sqlite3
-     :name ":memory:"))))
+ :migrations-directory
+ (merge-pathnames
+  (asdf:system-relative-pathname :hermetic-crane-demo #p"contrib/crane/demo/migrations/"))
+ :databases
+ '(:main
+   (:type :sqlite3
+    :name ":memory:")))
 
 (connect)
 
