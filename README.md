@@ -1,30 +1,16 @@
 # Hermetic
 
-Simple authentication for [Clack](http://clacklisp.org/)-based Common Lisp web applications.
+Simple authentication for [Clack](http://clacklisp.org/)-based Common Lisp web
+applications.
 
 # Usage
 
 See the demo app for a complete example.
 
-# Structure
-
-Hermetic implements authentication and authorization, respectively, using
-*strategies* and *roles*.
-
-## Strategies
-
-A strategy represents a pluggable module that decides whether requests are
-authorized to go through the web application or should be denied.
-
-At the moment, Hermetic only supports trivial, Cookie-based authentication in
-the `hermetic-cookie` module.
-
-## Roles
-
-
 ## Available Password-Hashing Functions
 
-To mitigate the risks of the NSA convincing people to hash passwords with things like SHA-256, only PBKDF2 (And eventually scrypt) is supported
+To mitigate the risks of the NSA convincing people to hash passwords with things
+like SHA-256, only PBKDF2 (And eventually scrypt) is supported
 
 * `:pbkdf2-sha1`
 * `:pbkdf2-sha256`
@@ -32,8 +18,9 @@ To mitigate the risks of the NSA convincing people to hash passwords with things
 
 ## `setup`
 
-Hermetic is not opinionated, doesn't integrate into an existing database or create any models.
-As such, it needs to be told how to find a user's information to provide authentication. This is what `setup` is for:
+Hermetic is not opinionated, doesn't integrate into an existing database or
+create any models. As such, it needs to be told how to find a user's
+information to provide authentication. This is what `setup` is for:
 
 ```lisp
 (setup
@@ -47,7 +34,8 @@ As such, it needs to be told how to find a user's information to provide authent
                    )
 ```
 
-For example, if your users are stored in a simple in-memory hash-table as in the demo app:
+For example, if your users are stored in a simple in-memory hash-table as in the
+demo app:
 
 ```lisp
 (defmacro get-user (username)
@@ -62,11 +50,13 @@ For example, if your users are stored in a simple in-memory hash-table as in the
 
 ## `login`
 
-When creating your login view, the `login` macro handles most of the work for you.
+When creating your login view, the `login` macro handles most of the work for
+you.
 
 ## `auth`
 
-Grants access to a site only to users whose roles intersect with the roles in the first argument.
+Grants access to a site only to users whose roles intersect with the roles in
+the first argument.
 
 If an access denied page is not provided, the global one is used instead.
 
@@ -82,8 +72,8 @@ Example:
 
 ## Misc.
 
-When `auth` isn't enough to determine who gets to use what, Hermetic provides a few
-functions for accessing user data from inside a view.
+When `auth` isn't enough to determine who gets to use what, Hermetic provides a
+few functions for accessing user data from inside a view.
 
 * `logged-in-p`: Exactly what it says on the tin.
 * `user-name`: Returns the username of the current user.
