@@ -8,9 +8,7 @@
   :author "Fernando Borretti"
   :license "MIT"
   :depends-on (:clack
-               :ironclad
-               :trivial-utf-8
-               :split-sequence)
+               :cl-pass)
   :components ((:module "src"
                 :components
                 ((:file "hermetic"))))
