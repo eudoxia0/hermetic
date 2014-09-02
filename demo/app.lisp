@@ -24,7 +24,7 @@
 
 (defun make-user (username pass roles)
   (setf (gethash username *users*)
-        (list :pass (hermetic:hash pass :type :pbkdf2-sha256
+        (list :pass (cl-pass:hash pass :type :pbkdf2-sha256
                                         :iterations 10000)
               :roles roles)))
 
