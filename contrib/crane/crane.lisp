@@ -32,13 +32,13 @@
   (password :type text)
   (joined :type timestamp)
   (:abstractp t))
-  
+
 (defmacro setup (&key user-table session denied)
   `(progn
      (deftable <role> ()
        (name :type text :uniquep t)
        (:deferredp t))
-     
+
      (deftable <user-role> ()
        (user :type integer :foreign (,user-table))
        (role :type integer :foreign (<role>))
@@ -46,7 +46,7 @@
 
      (crane:build 'hermetic-crane:<role>)
      (crane:build 'hermetic-crane:<user-role>)
-     
+
      (hermetic:setup
       :user-p (lambda (username)
                 (crane:exists ',user-table :username username))

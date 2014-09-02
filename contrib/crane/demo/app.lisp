@@ -36,8 +36,6 @@
 (deftable <my-users> (<abstract-user>)
   (age :type integer))
 
-(crane:build '<my-users>)
-
 (hermetic-crane:setup
  :user-table <my-users>
  :session *session*
