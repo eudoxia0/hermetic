@@ -6,6 +6,7 @@
 (defsystem hermetic-crane-demo
   :version "0.1"
   :author "Fernando Borretti"
+  :description "Demo for Hermetic Crane"
   :license "MIT"
   :depends-on (:hermetic-crane
                :cl-markup

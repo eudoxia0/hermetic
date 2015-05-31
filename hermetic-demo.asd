@@ -6,6 +6,7 @@
 (defsystem hermetic-demo
   :version "0.1"
   :author "Fernando Borretti"
+  :description "Demo for Hermetic"
   :license "MIT"
   :depends-on (:hermetic
                :ningle
