@@ -4,10 +4,9 @@
                 :html5)
   (:import-from :ningle
                 :*session*)
-  (:import-from :clack.builder
+  (:import-from :lack.builder
                 :builder)
-  (:import-from :clack.middleware.session
-                :<clack-middleware-session>)
+  (:import-from :lack.middleware.session)
   (:import-from :hermetic
                 :setup
                 :login
@@ -49,16 +48,20 @@
                    (:a :href "/logout" "Logout"))
             (html5
              (:form :action "/login" :method "post"
-                    "Username:" (:input :type "text" :name "username") (:br)
-                    "Password:" (:input :type "text" :name "password") (:br)
+                    "Username:" (:input :type "text" :name :|username|) (:br)
+                    "Password:" (:input :type "password" :name :|password|) (:br)
                     (:input :type "submit" :value "Login"))))))
 
 (setf (ningle:route *app* "/login" :method :POST)
       (lambda (params)
-        (login params
-               (html5 (:h1 "You are logged in"))
-               (html5 (:h1 "Wrong password :c"))
-               (html5 (:h1 "No such username")))))
+        (let* ((username (cdr (assoc "username" params :test #'equal)))
+               (password (cdr (assoc "password" params :test #'equal)))
+               (params (list :|username| username :|password| password)))
+         (login params
+                (html5 (:h1 "You are logged in"))
+                (html5 (:h1 "Wrong password :c"))
+                (html5 (:h1 "No such username " params))
+                ))))
 
 (setf (ningle:route *app* "/logout" :method :GET)
       (lambda (params)
@@ -80,7 +83,7 @@
 (defparameter *handler*
   (clack:clackup
    (builder
-    <clack-middleware-session>
+    :session
     *app*)
    :port 8000))
 
