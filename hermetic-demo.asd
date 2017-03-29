@@ -10,6 +10,7 @@
   :license "MIT"
   :depends-on (:hermetic
                :ningle
+               :lack-middleware-session
                :cl-markup)
   :components ((:module "demo"
                 :components
