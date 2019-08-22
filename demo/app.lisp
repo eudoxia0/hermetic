@@ -6,7 +6,6 @@
                 :*session*)
   (:import-from :lack.builder
                 :builder)
-  (:import-from :lack.middleware.session)
   (:import-from :hermetic
                 :setup
                 :login
