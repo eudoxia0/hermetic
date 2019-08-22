@@ -3,7 +3,8 @@
   (:export :setup
            :login
            :logged-in-p
-           :username
+           :logout
+           :user-name
            :roles
            :role-p
            :auth))
